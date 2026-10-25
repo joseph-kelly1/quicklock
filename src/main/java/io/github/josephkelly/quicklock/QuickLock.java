@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -37,6 +39,14 @@ public final class QuickLock implements ModInitializer {
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             if (Protection.active != null) Protection.active.forget(handler.player.getUUID());
             AccessLabels.forget(handler.player.getUUID());
+        });
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            AccessLabels.clear(newPlayer);
+            if (Protection.active != null) Protection.active.forget(newPlayer.getUUID());
+        });
+        ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> {
+            AccessLabels.clear(player);
+            if (Protection.active != null) Protection.active.forget(player.getUUID());
         });
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             var p = Protection.active;

@@ -269,8 +269,9 @@ public final class Protection {
 
     public boolean pickup(ItemStack stack, UUID player) {
         if (!hasToken(stack)) return true;
+        if (admin(player)) return !failed;
         var record = state.locks.get(token(stack));
-        return !failed && record != null && record.shulker && record.portable && (record.owner.equals(player) || admin(player));
+        return !failed && record != null && record.shulker && record.portable && record.owner.equals(player);
     }
 
     public void tick() {
