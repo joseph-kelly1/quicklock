@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "quicklock-test",
+  "version": "1.0.0",
+  "environment": "server",
+  "entrypoints": {"fabric-gametest": ["io.github.josephkelly.quicklock.ProtectionGameTests"]},
+  "depends": {"quicklock": "*"}
+}

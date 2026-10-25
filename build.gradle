@@ -27,3 +27,18 @@ processResources {
     filesMatching('fabric.mod.json') { expand version: project.version }
 }
 jar { from('LICENSE') { rename { 'LICENSE_quicklock' } } }
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'quicklock-test'
+        enableGameTests = true
+        enableClientGameTests = false
+        eula = true
+    }
+}
+
+if (providers.gradleProperty('withLithium').isPresent()) {
+    repositories { maven { url = 'https://api.modrinth.com/maven' } }
+    dependencies { gametestImplementation 'maven.modrinth:lithium:mc26.3-0.26.2-fabric' }
+}
