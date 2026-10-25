@@ -1,5 +1,7 @@
 # QuickLock
 
+![QuickLock](quicklock.png)
+
 Selective container protection for **Minecraft Java 26.3 / Fabric**, built from scratch under MIT.
 
 **Status: alpha.** Automated policy and dedicated-server tests exist, including Lithium coverage. Real vanilla-client rendering, multiplayer acceptance, and the complete companion-mod stack still need the checks in [TESTING.md](docs/TESTING.md). Do not treat compilation or packet-level tests as proof of those behaviors.
