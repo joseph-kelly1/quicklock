@@ -44,6 +44,7 @@ public final class Protection {
     private final Map<UUID, Long> denials = new HashMap<>();
     public final Map<UUID, Opened> opened = new HashMap<>();
     public final ThreadLocal<Break> breaking = new ThreadLocal<>();
+    private final Set<BlockEntity> loadedWitnessUpdates = Collections.newSetFromMap(new IdentityHashMap<>());
     private boolean failed;
     public record Opened(ServerLevel level, BlockPos pos, int menuId) {}
     public record Break(String key, LockState.Lock lock) {}
@@ -105,12 +106,12 @@ public final class Protection {
             inconsistent(entity); return;
         }
         // Reapply the authoritative state after an unlock/lock saved before its chunk was flushed.
-        if (placement != null) {
-            witness.quicklock$witness(placement.stamp.toString(), placement.lock == null ? "" : placement.lock.toString());
-            entity.setChanged();
-        } else if (!witness.quicklock$stamp().isEmpty()) {
-            witness.quicklock$witness("", "");
-            entity.setChanged();
+        String stamp = placement == null ? "" : placement.stamp.toString();
+        String lock = placement == null || placement.lock == null ? "" : placement.lock.toString();
+        if (!stamp.equals(witness.quicklock$stamp()) || !lock.equals(witness.quicklock$lock())) {
+            witness.quicklock$witness(stamp, lock);
+            // setChanged() requests its chunk. Calling it from setLevel() during chunk post-load deadlocks.
+            loadedWitnessUpdates.add(entity);
         }
     }
 
@@ -275,6 +276,13 @@ public final class Protection {
     }
 
     public void tick() {
+        var updates = new ArrayList<>(loadedWitnessUpdates);
+        loadedWitnessUpdates.clear();
+        for (BlockEntity entity : updates) {
+            Level level = entity.getLevel();
+            if (level != null && !entity.isRemoved() && level.hasChunkAt(entity.getBlockPos())
+                    && level.getBlockEntity(entity.getBlockPos()) == entity) entity.setChanged();
+        }
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             Opened tracked = opened.get(player.getUUID());
             if (tracked == null) continue;
