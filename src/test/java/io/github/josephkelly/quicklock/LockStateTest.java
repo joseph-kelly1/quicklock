@@ -112,6 +112,12 @@ class LockStateTest {
         assertThrows(IllegalStateException.class, s::validate);
     }
 
+    @Test void incompleteStateCannotSilentlyReset(@TempDir Path dir) throws Exception {
+        Path file=dir.resolve("quicklock.json");
+        Files.writeString(file,"{}");
+        assertThrows(java.io.IOException.class,() -> new StateStore(file));
+    }
+
     @Test void persistenceRoundTripAndBackupGuard(@TempDir Path dir) throws Exception {
         Path file = dir.resolve("quicklock.json");
         StateStore store = new StateStore(file);

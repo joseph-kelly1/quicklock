@@ -10,16 +10,19 @@ public final class LockState {
     public Map<UUID, Set<UUID>> globalTrust = new HashMap<>();
     public Set<UUID> viewers = new HashSet<>();
     public Map<UUID, String> names = new HashMap<>();
+    public Set<UUID> unlockedIds = new HashSet<>();
 
     public static final class Placement {
         public UUID placer;
         public String block;
         public UUID lock;
+        public UUID stamp;
 
         public Placement(UUID placer, String block, UUID lock) {
             this.placer = placer;
             this.block = block;
             this.lock = lock;
+            this.stamp = UUID.randomUUID();
         }
     }
 
@@ -97,6 +100,7 @@ public final class LockState {
             if (placement != null && lock.id.equals(placement.lock)) placement.lock = null;
         }
         locks.remove(lock.id);
+        unlockedIds.add(lock.id);
     }
 
     public void removed(String key) {
@@ -127,18 +131,18 @@ public final class LockState {
 
     /** Reject inconsistent records rather than silently reopening inventories. */
     public void validate() {
-        if (schema != 1 || placements == null || locks == null || globalTrust == null || viewers == null || names == null) {
+        if (schema != 1 || placements == null || locks == null || globalTrust == null || viewers == null || names == null || unlockedIds == null) {
             throw new IllegalStateException("Unsupported or incomplete QuickLock data");
         }
         placements.forEach((key, p) -> {
-            if (key == null || p == null || p.placer == null || p.block == null) throw new IllegalStateException("Invalid placement");
+            if (key == null || p == null || p.placer == null || p.block == null || p.stamp == null) throw new IllegalStateException("Invalid placement");
             if (p.lock != null) {
                 Lock lock = locks.get(p.lock);
                 if (lock == null || lock.positions == null || !lock.positions.contains(key)) throw new IllegalStateException("Orphan placement lock");
             }
         });
         locks.forEach((id, lock) -> {
-            if (lock == null || !id.equals(lock.id) || lock.owner == null || lock.trusted == null || lock.positions == null
+            if (lock == null || !id.equals(lock.id) || unlockedIds.contains(id) || lock.owner == null || lock.trusted == null || lock.positions == null
                     || lock.trusted.contains(null) || lock.positions.isEmpty() != lock.portable || lock.portable && !lock.shulker
                     || lock.shulker && lock.positions.size() > 1 || lock.positions.size() > 2) {
                 throw new IllegalStateException("Invalid lock record");

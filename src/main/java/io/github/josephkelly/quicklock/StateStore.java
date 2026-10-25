@@ -2,6 +2,7 @@ package io.github.josephkelly.quicklock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,11 @@ public final class StateStore {
     public StateStore(Path path) throws IOException {
         this.path = path;
         if (Files.exists(path)) {
-            state = GSON.fromJson(Files.readString(path), LockState.class);
+            var json = JsonParser.parseString(Files.readString(path)).getAsJsonObject();
+            for (String field : java.util.List.of("schema", "placements", "locks", "globalTrust", "viewers", "names", "unlockedIds")) {
+                if (!json.has(field)) throw new IOException("Incomplete QuickLock state (missing " + field + "): " + path);
+            }
+            state = GSON.fromJson(json, LockState.class);
             if (state == null) throw new IOException("Empty QuickLock state: " + path);
             state.validate();
         } else {
