@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "io.github.josephkelly.quicklock.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "CompoundContainerAccessor", "BlockItemMixin", "LevelChunkMixin", "PlayerGameModeMixin",
+    "ContainerBlockEntityMixin", "CompoundContainerMixin", "HopperMixin", "ExplosionMixin",
+    "LevelMixin", "PistonMixin", "GolemMixin", "ItemEntityMixin", "BlockEntityComponentsMixin", "ShulkerBlockMixin", "BlockWitnessMixin",
+    "TransferStorageAccessor", "TransferSlotMixin", "ContainerValidityMixin", "CommandSourceAccessor"
+  ],
+  "injectors": {"defaultRequire": 1}
+}

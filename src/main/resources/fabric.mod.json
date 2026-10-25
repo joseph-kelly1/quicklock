@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "quicklock",
+  "version": "${version}",
+  "name": "QuickLock",
+  "description": "Selective server-side container protection with placement ownership, trust, and private access labels.",
+  "authors": ["Joseph Kelly"],
+  "contact": {"sources": "https://github.com/joseph-kelly1/quicklock", "issues": "https://github.com/joseph-kelly1/quicklock/issues"},
+  "license": "MIT",
+  "environment": "server",
+  "entrypoints": {"main": ["io.github.josephkelly.quicklock.QuickLock"]},
+  "mixins": ["quicklock.mixins.json"],
+  "depends": {"fabricloader": ">=0.20.1", "minecraft": "26.3", "java": ">=25", "fabric-api": ">=0.165.0"}
+}
