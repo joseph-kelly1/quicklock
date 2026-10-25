@@ -1,6 +1,10 @@
 # QuickLock implementation plan
 
-Status: planning draft. Implementation, commits, pushes, deployment, and publication have not started.
+Status: implemented as `0.1.0-alpha.1` on `codex/quicklock`. The original phase descriptions below are the planning record; their full live-client acceptance gates are not all satisfied. See `TESTING.md` for actual evidence and remaining checks. Deployment and publication have not occurred.
+
+Implementation uses the proposed decision-table defaults: same-owner locked block hoppers may pull, incoming items and public outputs are allowed, mixed-placer public double chests cannot be locked by ordinary players, shulker replacement is owner/admin only, and known offline names are supported. Direct Fabric Transfer API extraction from locked storage is denied because the API does not supply an authenticated destination identity.
+
+Completed Git checkpoints group the tightly connected commands, enforcement, chest, shulker, and label work into one tested feature commit, with separate toolchain, persistence, integration-test, and documentation checkpoints. Early feasibility evidence uses real server execution and captured vanilla packets; human-client rendering remains unverified. Build/test results are not substitutes for that gate.
 
 ## 1. Product contract
 

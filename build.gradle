@@ -26,7 +26,14 @@ processResources {
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') { expand version: project.version }
 }
-jar { from('LICENSE') { rename { 'LICENSE_quicklock' } } }
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.withType(Jar).configureEach {
+    from('LICENSE') { rename { 'LICENSE_quicklock' } }
+    from('THIRD_PARTY_NOTICES.md')
+}
 
 fabricApi {
     configureTests {
